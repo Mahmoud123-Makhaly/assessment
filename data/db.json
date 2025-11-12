@@ -7,16 +7,10 @@
       "column": "backlog"
     },
     {
-      "id": "ce4c",
-      "title": "task1",
-      "description": "desc",
-      "column": "backlog"
-    },
-    {
       "id": "f017",
       "title": "task2",
       "description": "desc",
-      "column": "backlog"
+      "column": "Review"
     },
     {
       "id": "371e",
@@ -29,6 +23,30 @@
       "title": "task4",
       "description": "desc",
       "column": "backlog"
+    },
+    {
+      "id": "94ad",
+      "title": "task6",
+      "description": "desc",
+      "column": "Review"
+    },
+    {
+      "id": "97d7",
+      "title": "task77",
+      "description": "desc",
+      "column": "backlog"
+    },
+    {
+      "id": "d37b",
+      "title": "task8",
+      "description": "desc",
+      "column": "In Progress"
+    },
+    {
+      "id": "620d",
+      "title": "task9",
+      "description": "desc",
+      "column": "Done"
     }
   ]
 }

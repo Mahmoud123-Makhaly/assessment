@@ -17,31 +17,75 @@ interface TaskProps {
 }
 
 const TaskCard = (props: TaskProps) => {
-  const { tasks, title, titleBg, isLoading, onEditTask } = props;
+  const { tasks, title, titleBg, setTasks, refetch, isLoading, onEditTask } =
+    props;
 
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
-    taskId: number | undefined
+    taskId: string | number
   ) => {
     e.dataTransfer.setData("taskId", String(taskId));
-    e.dataTransfer.setData("title", title);
-    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.setData("fromColumn", title);
     e.dataTransfer.effectAllowed = "move";
   };
+
+  // Handle drag over within same column (for reorder)
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  // Handle dropping over another task in same column
+  const handleDrop = (
+    e: React.DragEvent<HTMLDivElement>,
+    targetTaskId: string | number
+  ) => {
+    e.preventDefault();
+    const draggedTaskId = e.dataTransfer.getData("taskId");
+    const fromColumn = e.dataTransfer.getData("fromColumn");
+
+    // If not same column, let App.tsx handle it
+    if (fromColumn !== title) return;
+
+    // Reorder tasks locally
+    setTasks((prev) => {
+      const current = [...prev];
+      const sameColumnTasks = current.filter((t) => t.column === title);
+      const draggedIndex = sameColumnTasks.findIndex(
+        (t) => String(t.id) === draggedTaskId
+      );
+      const targetIndex = sameColumnTasks.findIndex(
+        (t) => String(t.id) === String(targetTaskId)
+      );
+
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+
+      // Reorder inside same column
+      const [dragged] = sameColumnTasks.splice(draggedIndex, 1);
+      sameColumnTasks.splice(targetIndex, 0, dragged);
+
+      // Replace column’s tasks with reordered version
+      const reordered = current.map((t) =>
+        t.column === title ? sameColumnTasks.find((x) => x.id === t.id) || t : t
+      );
+
+      return reordered;
+    });
+  };
+
   const handleDeleteTask = async (taskId: number | undefined) => {
     await AxiosInstance.delete(`/tasks/${taskId}`);
-    props.refetch();
+    refetch();
   };
 
   return (
-    <Card className="my-2  task-card">
+    <Card className="my-2 task-card">
       <CardHeader
         className={`bg-${titleBg} text-center text-white fw-semibold`}
       >
-        {" "}
         {title}
       </CardHeader>
-      <CardBody className="position-relative">
+
+      <CardBody className="position-relative" onDragOver={handleDragOver}>
         {isLoading ? (
           <div className="d-flex justify-content-center position-absolute start-50 top-50 translate-middle">
             <div className="spinner-border" role="status">
@@ -49,19 +93,19 @@ const TaskCard = (props: TaskProps) => {
             </div>
           </div>
         ) : tasks.length > 0 ? (
-          tasks?.map((task: ITask, index: number) => (
+          tasks.map((task: ITask, index: number) => (
             <div
               key={task.id}
-              className="pointer"
               draggable
-              onDragStart={(e) => handleDragStart(e, task.id)}
+              onDragStart={(e) => handleDragStart(e, task.id!)}
+              onDrop={(e) => handleDrop(e, task.id!)} // 👈 drop target
             >
               <Alert
                 color="light"
-                className="border border-info shadow pointer d-flex justify-content-between align-items-center"
+                className="border border-info shadow pointer d-flex justify-content-between align-items-center mb-2"
               >
                 <span>
-                  {task.title} - # {index + 1}
+                  {task.title} - #{index + 1}
                 </span>
                 <div className="d-flex align-items-center gap-2">
                   <FaEdit
@@ -85,4 +129,5 @@ const TaskCard = (props: TaskProps) => {
     </Card>
   );
 };
+
 export default TaskCard;
