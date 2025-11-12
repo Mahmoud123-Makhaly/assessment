@@ -29,12 +29,10 @@ const TaskCard = (props: TaskProps) => {
     e.dataTransfer.effectAllowed = "move";
   };
 
-  // Handle drag over within same column (for reorder)
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
 
-  // Handle dropping over another task in same column
   const handleDrop = (
     e: React.DragEvent<HTMLDivElement>,
     targetTaskId: string | number
@@ -43,10 +41,9 @@ const TaskCard = (props: TaskProps) => {
     const draggedTaskId = e.dataTransfer.getData("taskId");
     const fromColumn = e.dataTransfer.getData("fromColumn");
 
-    // If not same column, let App.tsx handle it
     if (fromColumn !== title) return;
 
-    // Reorder tasks locally
+
     setTasks((prev) => {
       const current = [...prev];
       const sameColumnTasks = current.filter((t) => t.column === title);
@@ -59,11 +56,9 @@ const TaskCard = (props: TaskProps) => {
 
       if (draggedIndex === -1 || targetIndex === -1) return prev;
 
-      // Reorder inside same column
       const [dragged] = sameColumnTasks.splice(draggedIndex, 1);
       sameColumnTasks.splice(targetIndex, 0, dragged);
 
-      // Replace column’s tasks with reordered version
       const reordered = current.map((t) =>
         t.column === title ? sameColumnTasks.find((x) => x.id === t.id) || t : t
       );
@@ -98,7 +93,7 @@ const TaskCard = (props: TaskProps) => {
               key={task.id}
               draggable
               onDragStart={(e) => handleDragStart(e, task.id!)}
-              onDrop={(e) => handleDrop(e, task.id!)} // 👈 drop target
+              onDrop={(e) => handleDrop(e, task.id!)} 
             >
               <Alert
                 color="light"

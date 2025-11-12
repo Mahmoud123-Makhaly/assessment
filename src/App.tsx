@@ -46,7 +46,7 @@ const App = () => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData("taskId");
 
-    // Optimistically update UI
+    
     setTasks((prev: ITask[]) =>
       prev.map((task: ITask) =>
         String(task.id) === taskId ? { ...task, column: newColumn } : task
@@ -54,17 +54,16 @@ const App = () => {
     );
 
     try {
-      // Find the dragged task
+  
       const movedTask = tasks.find((t) => String(t.id) === taskId);
       if (!movedTask) return;
 
-      // Update in backend
+ 
       await AxiosInstance.put(`/tasks/${taskId}`, {
         ...movedTask,
         column: newColumn,
       });
 
-      // Re-fetch fresh data
       refetch();
     } catch (err) {
       console.error("Failed to update task column:", err);
@@ -99,7 +98,6 @@ const App = () => {
     const { name, value } = e.target;
     setTaskToAdd((prev) => ({ ...prev, [name]: value }));
   };
-  // ****************************************************************
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setTaskIdToEdit((prev) => ({ ...prev, [name]: value }));
@@ -195,7 +193,7 @@ const App = () => {
           {addTaskForm.map((input: ITaskForm) =>
             input.type === "select" ? (
               <Input
-                type="select" // CHANGE: Use select for column
+                type="select" 
                 className="form-control mb-3"
                 name={input.name}
                 value={taskToAdd[input.name]}
@@ -227,7 +225,6 @@ const App = () => {
           <Button className="btn btn-info w-100 text-white">Submit</Button>
         </form>
       </ModalMaker>
-      {/* edit modal *******************************  */}
       <ModalMaker
         title=" Edit Task"
         isOpen={isOpenEditModal}
