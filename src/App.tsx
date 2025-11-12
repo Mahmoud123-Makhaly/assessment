@@ -39,15 +39,38 @@ const App = () => {
   const handleOnDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
-  const handleOnDrop = (e: React.DragEvent<HTMLDivElement>, title: string) => {
+  const handleOnDrop = async (
+    e: React.DragEvent<HTMLDivElement>,
+    newColumn: string
+  ) => {
+    e.preventDefault();
     const taskId = e.dataTransfer.getData("taskId");
 
+    // Optimistically update UI
     setTasks((prev: ITask[]) =>
-      prev.map((task) =>
-        task.id === Number(taskId) ? { ...task, column: title } : task
+      prev.map((task: ITask) =>
+        String(task.id) === taskId ? { ...task, column: newColumn } : task
       )
     );
+
+    try {
+      // Find the dragged task
+      const movedTask = tasks.find((t) => String(t.id) === taskId);
+      if (!movedTask) return;
+
+      // Update in backend
+      await AxiosInstance.put(`/tasks/${taskId}`, {
+        ...movedTask,
+        column: newColumn,
+      });
+
+      // Re-fetch fresh data
+      refetch();
+    } catch (err) {
+      console.error("Failed to update task column:", err);
+    }
   };
+
   const filteredData = tasks.filter((task: ITask) =>
     task.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -106,14 +129,11 @@ const App = () => {
         column: taskIdToEdit.column,
       };
 
-   
       await AxiosInstance.put(`/tasks/${taskIdToEdit.id}`, updatedTask);
 
-   
       setTasks((prev) =>
         prev.map((task) => (task.id === taskIdToEdit.id ? updatedTask : task))
       );
-
 
       refetch();
 
