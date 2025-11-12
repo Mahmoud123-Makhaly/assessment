@@ -3,6 +3,8 @@ import type { ITask } from "../../interfaces";
 import "./TaskCard.css";
 import AxiosInstance from "../../config/axios.config";
 import { IoMdCloseCircleOutline } from "react-icons/io";
+import { FaEdit } from "react-icons/fa";
+
 interface TaskProps {
   tasks: ITask[];
   title: string;
@@ -11,10 +13,11 @@ interface TaskProps {
   setTasks: React.Dispatch<React.SetStateAction<ITask[]>>;
   refetch: () => void;
   isLoading: boolean;
+  onEditTask: (taskId: number | undefined) => void;
 }
 
 const TaskCard = (props: TaskProps) => {
-  const { tasks, title, titleBg, isLoading } = props;
+  const { tasks, title, titleBg, isLoading, onEditTask } = props;
 
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
@@ -22,11 +25,14 @@ const TaskCard = (props: TaskProps) => {
   ) => {
     e.dataTransfer.setData("taskId", String(taskId));
     e.dataTransfer.setData("title", title);
+    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.effectAllowed = "move";
   };
   const handleDeleteTask = async (taskId: number | undefined) => {
-    await AxiosInstance.delete(`/tasks/${String(taskId)}`);
+    await AxiosInstance.delete(`/tasks/${taskId}`);
     props.refetch();
   };
+
   return (
     <Card className="my-2  task-card">
       <CardHeader
@@ -43,18 +49,32 @@ const TaskCard = (props: TaskProps) => {
             </div>
           </div>
         ) : tasks.length > 0 ? (
-          tasks?.map((task: ITask) => (
+          tasks?.map((task: ITask, index: number) => (
             <div
               key={task.id}
               className="pointer"
               draggable
               onDragStart={(e) => handleDragStart(e, task.id)}
             >
-              <Alert color="border border-info shadow pointer d-flex justify-content-between align-items-center">
-                {task.title} - # {task.id}
-                <IoMdCloseCircleOutline
-                  onClick={() => handleDeleteTask(task.id)}
-                />
+              <Alert
+                color="light"
+                className="border border-info shadow pointer d-flex justify-content-between align-items-center"
+              >
+                <span>
+                  {task.title} - # {index + 1}
+                </span>
+                <div className="d-flex align-items-center gap-2">
+                  <FaEdit
+                    size={20}
+                    onClick={() => onEditTask(task.id)}
+                    className="text-primary"
+                  />
+                  <IoMdCloseCircleOutline
+                    size={20}
+                    onClick={() => handleDeleteTask(task.id)}
+                    className="text-danger"
+                  />
+                </div>
               </Alert>
             </div>
           ))

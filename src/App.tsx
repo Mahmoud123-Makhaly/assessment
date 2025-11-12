@@ -1,7 +1,7 @@
 import { Button, Col, Container, Input, Row } from "reactstrap";
 import TaskCard from "./components/task/TaskCard";
 import UseQuery from "./hooks/UseQuery";
-import type { IAddTaskForm, ITask } from "./interfaces";
+import type { ITask, ITaskForm } from "./interfaces";
 import { addTaskForm, CardsData } from "./data";
 import { useEffect, useState } from "react";
 import Search from "./components/search/Search";
@@ -16,13 +16,20 @@ const App = () => {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [search, setSearch] = useState<string>("");
   const [isOpenAddModal, setIsOpenAddModal] = useState<boolean>(false);
+  const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
   const [taskToAdd, setTaskToAdd] = useState<ITask>({
     id: 0,
     title: "",
     description: "",
     column: "",
   });
+  const [taskIdToEdit, setTaskIdToEdit] = useState<ITask>({
+    title: "",
+    description: "",
+    column: "",
+  });
   const toggleAddModal = () => setIsOpenAddModal(!isOpenAddModal);
+  const toggleEditModal = () => setIsOpenEditModal(!isOpenEditModal);
   useEffect(() => {
     if (data?.data) {
       setTasks(data.data);
@@ -48,7 +55,6 @@ const App = () => {
     e.preventDefault();
     if (!taskToAdd.title || !taskToAdd.description || !taskToAdd.column) return;
     const newTask = {
-      id: tasks.length + 1,
       title: taskToAdd.title,
       description: taskToAdd.description,
       column: taskToAdd.column,
@@ -64,11 +70,65 @@ const App = () => {
       description: "",
       column: "",
     });
+    refetch();
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setTaskToAdd((prev) => ({ ...prev, id: Date.now(), [name]: value }));
+    setTaskToAdd((prev) => ({ ...prev, [name]: value }));
   };
+  // ****************************************************************
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setTaskIdToEdit((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleEditTask = (taskId: number | undefined) => {
+    setIsOpenEditModal(true);
+    const taskToEdit = tasks.find((task: ITask) => task.id === taskId);
+    if (taskToEdit) {
+      setTaskIdToEdit(taskToEdit);
+    }
+  };
+  const handleSubmitEdit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (
+      !taskIdToEdit.title ||
+      !taskIdToEdit.description ||
+      !taskIdToEdit.column
+    )
+      return;
+
+    try {
+      const updatedTask = {
+        id: taskIdToEdit.id,
+        title: taskIdToEdit.title,
+        description: taskIdToEdit.description,
+        column: taskIdToEdit.column,
+      };
+
+   
+      await AxiosInstance.put(`/tasks/${taskIdToEdit.id}`, updatedTask);
+
+   
+      setTasks((prev) =>
+        prev.map((task) => (task.id === taskIdToEdit.id ? updatedTask : task))
+      );
+
+
+      refetch();
+
+      toggleEditModal();
+      setTaskIdToEdit({
+        id: 0,
+        title: "",
+        description: "",
+        column: "",
+      });
+    } catch (error) {
+      console.error("Failed to update task:", error);
+    }
+  };
+
   return (
     <main className="py-5">
       <Container>
@@ -100,6 +160,7 @@ const App = () => {
                 setTasks={setTasks}
                 refetch={refetch}
                 isLoading={isLoading}
+                onEditTask={handleEditTask}
               />
             </Col>
           ))}
@@ -111,7 +172,7 @@ const App = () => {
         toggle={toggleAddModal}
       >
         <form onSubmit={handleSubmit}>
-          {addTaskForm.map((input: IAddTaskForm) =>
+          {addTaskForm.map((input: ITaskForm) =>
             input.type === "select" ? (
               <Input
                 type="select" // CHANGE: Use select for column
@@ -121,7 +182,9 @@ const App = () => {
                 onChange={handleChange}
                 required
               >
-                <option value="">Select Column</option>
+                <option disabled value="">
+                  Select Column
+                </option>
                 {CardsData.map((card) => (
                   <option key={card.id} value={card.title}>
                     {card.title}
@@ -136,6 +199,48 @@ const App = () => {
                 name={input.name}
                 value={taskToAdd[input.name]}
                 onChange={handleChange}
+                required
+              />
+            )
+          )}
+
+          <Button className="btn btn-info w-100 text-white">Submit</Button>
+        </form>
+      </ModalMaker>
+      {/* edit modal *******************************  */}
+      <ModalMaker
+        title=" Edit Task"
+        isOpen={isOpenEditModal}
+        toggle={toggleEditModal}
+      >
+        <form onSubmit={handleSubmitEdit}>
+          {addTaskForm.map((input: ITaskForm) =>
+            input.type === "select" ? (
+              <Input
+                type="select"
+                className="form-control mb-3"
+                name={input.name}
+                value={taskIdToEdit[input.name]}
+                onChange={handleEditChange}
+                required
+              >
+                <option disabled value="">
+                  Select Column
+                </option>
+                {CardsData.map((card) => (
+                  <option key={card.id} value={card.title}>
+                    {card.title}
+                  </option>
+                ))}
+              </Input>
+            ) : (
+              <Input
+                type={input.type}
+                placeholder={input.placeholder}
+                className="form-control mb-3"
+                name={input.name}
+                value={taskIdToEdit[input.name]}
+                onChange={handleEditChange}
                 required
               />
             )

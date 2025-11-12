@@ -4,7 +4,7 @@ export interface ITask {
   description: string;
   column: string;
 }
-export interface IAddTaskForm {
+export interface ITaskForm {
   id: number;
   type: "select" | "text";
   placeholder?: string;

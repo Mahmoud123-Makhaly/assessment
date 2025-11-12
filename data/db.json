@@ -1,70 +1,10 @@
 {
   "tasks": [
     {
-      "id": "1",
-      "title": "task1",
-      "description": "desc",
-      "column": "backlog"
-    },
-    {
-      "id": "2",
-      "title": "task2",
-      "description": "desc",
-      "column": "backlog"
-    },
-    {
-      "id": "3",
-      "title": "task3",
-      "description": "desc",
-      "column": "backlog"
-    },
-    {
-      "id": "7",
-      "title": "task7",
-      "description": "desc",
-      "column": "In Progress"
-    },
-    {
-      "id": "8",
-      "title": "task8",
-      "description": "desc",
-      "column": "In Progress"
-    },
-    {
-      "id": "9",
-      "title": "task9",
+      "id": "5724",
+      "title": "new title",
       "description": "desc",
       "column": "Review"
-    },
-    {
-      "id": "10",
-      "title": "task1",
-      "description": "desc",
-      "column": "Done"
-    },
-    {
-      "id": "11",
-      "title": "task11",
-      "description": "desc",
-      "column": "Done"
-    },
-    {
-      "id": "12",
-      "title": "task12",
-      "description": "desc",
-      "column": "Done"
-    },
-    {
-      "id": "13",
-      "title": "task13",
-      "description": "desc",
-      "column": "Done"
-    },
-    {
-      "id": 11,
-      "title": "task4",
-      "description": "desc",
-      "column": "In Progress"
     }
   ]
 }
