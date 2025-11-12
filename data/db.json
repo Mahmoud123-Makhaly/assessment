@@ -4,7 +4,7 @@
       "id": "59e8",
       "title": "task4",
       "description": "desc",
-      "column": "backlog"
+      "column": "In Progress"
     },
     {
       "id": "f017",
@@ -22,7 +22,7 @@
       "id": "58af",
       "title": "task4",
       "description": "desc",
-      "column": "backlog"
+      "column": "In Progress"
     },
     {
       "id": "94ad",
@@ -40,7 +40,7 @@
       "id": "d37b",
       "title": "task8",
       "description": "desc",
-      "column": "In Progress"
+      "column": "backlog"
     },
     {
       "id": "620d",

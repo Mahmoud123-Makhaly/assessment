@@ -1,4 +1,4 @@
-import type { IAddTaskForm } from "../interfaces";
+import type {  ITaskForm } from "../interfaces";
 
 export const CardsData: { id: number; title: string; color: string }[] = [
   {
@@ -23,7 +23,7 @@ export const CardsData: { id: number; title: string; color: string }[] = [
   },
 ];
 
-export const addTaskForm: IAddTaskForm[] = [
+export const addTaskForm: ITaskForm[] = [
   {
     id: 1,
     type: "text",
